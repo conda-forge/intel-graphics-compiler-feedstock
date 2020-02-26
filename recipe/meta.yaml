@@ -1,5 +1,5 @@
 {% set name = "intel-graphics-compiler" %}
-{% set version = "1.0.3342" %}
+{% set version = "1.0.3390" %}
 {% set llvm_version = "9.0.0" %}
 
 package:
@@ -8,11 +8,11 @@ package:
 
 source:
   url: https://github.com/intel/{{ name }}/archive/igc-{{ version }}.tar.gz
-  sha256: e7863ad5b353d94055a768fc09769848d93bf86bf25fb43f5071c6da33505b51
+  sha256: 73b4e100bd2a5250b339add8ef0b6d4ed6c6ab5a12d50a27882f5b98a0b06116
 
 build:
   number: 0
-  skip: True  # [not linux]
+  skip: true  # [not linux]
 
 requirements:
   build:
@@ -41,7 +41,7 @@ about:
   license: MIT
   license_file: LICENSE.md
   license_family: MIT
-  summary: 'The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.'
+  summary: The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.
 
 extra:
   recipe-maintainers:
