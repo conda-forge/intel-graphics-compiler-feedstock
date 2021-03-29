@@ -1,14 +1,14 @@
 {% set name = "intel-graphics-compiler" %}
-{% set version = "1.0.4312" %}
-{% set llvm_version = "9.0.0" %}
+{% set version = "1.0.6712" %}
+{% set llvm_version = "11.0.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/intel/{{ name }}/archive/igc-{{ version }}.tar.gz
-  sha256: 6a36b13639d24416cd3c47020ba917813801f0935a55c11c46a4450d918e7a7b
+  url: https://github.com/intel/intel-graphics-compiler/archive/igc-{{ version }}.tar.gz
+  sha256: 1e5d63337ccbf8304c34b045b66e6e8411ce7d95b8f34c5abff17f6e60033eb0
 
 build:
   number: 0
@@ -28,9 +28,6 @@ requirements:
     - intel-opencl-clang {{ llvm_version }}
   run:
     - intel-opencl-clang {{ llvm_version }}
-  run_constrained:
-    - llvmdev   {{ llvm_version }}
-    - clangdev  {{ llvm_version }}
 
 test:
   commands:
