@@ -1,6 +1,6 @@
 {% set name = "intel-graphics-compiler" %}
 {% set version = "1.0.6712" %}
-{% set llvm_version = "11.0.0" %}
+{% set llvm_version = "10.0.0" %}
 
 package:
   name: {{ name|lower }}
@@ -30,8 +30,10 @@ requirements:
     - llvm      {{ llvm_version }}
     - clangdev  {{ llvm_version }}
     - intel-opencl-clang {{ llvm_version }}
+    - llvm-spirv {{ llvm_version }}
   run:
     - intel-opencl-clang {{ llvm_version }}
+    - {{ pin_compatible("llvm-spirv", max_pin="x.x.x.x.x.x") }}
 
 test:
   commands:
