@@ -1,6 +1,6 @@
 {% set name = "intel-graphics-compiler" %}
 {% set version = "1.0.10409" %}
-{% set llvm_version = "11.1.0" %}
+{% set llvm_version = "11.0.0" %}
 
 package:
   name: {{ name|lower }}
