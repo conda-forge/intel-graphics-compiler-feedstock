@@ -20,6 +20,7 @@ cmake ${CMAKE_ARGS} \
     -DINSTALL_SPIRVDLL=0 \
     -DIGC_OPTION__LLVM_PREFERRED_VERSION=10.0.0 \
     -DFOUND_VCS=$PREFIX/lib/cmake/llvm/VersionFromVCS.cmake \
+    -DIGC_OPTION__SPIRV_TOOLS_MODE=Prebuilds \
     ..
 
 make -j${CPU_COUNT}
