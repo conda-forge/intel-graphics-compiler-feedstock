@@ -1,5 +1,5 @@
 {% set name = "intel-graphics-compiler" %}
-{% set version = "1.0.7041" %}
+{% set version = "1.0.12198.1"" %}
 {% set llvm_version = "10.0.0" %}
 
 package:
@@ -8,7 +8,7 @@ package:
 
 source:
   - url: https://github.com/intel/intel-graphics-compiler/archive/igc-{{ version }}.tar.gz
-    sha256: 299494ff885c8f0452c250867586be937a1aff9d46e6ff61a954bfc1e3a3c406
+    sha256: 73dc7bf431fcbde285d4d4ed83d4bb131629cc33b1a66f47f10267ac442a3d00
 
   - url: https://github.com/intel/vc-intrinsics/archive/d547de9478277e14896fa6418f6bb07ac07d7a1b.tar.gz
     sha256: 88944edb7abb28d3a8745727acc2fb934a5ea10059e25eeaf3c3169f534875fb
@@ -25,6 +25,7 @@ requirements:
     - make
     - flex
     - bison
+    - protobuf
   host:
     - llvmdev   {{ llvm_version }}
     - llvm      {{ llvm_version }}
