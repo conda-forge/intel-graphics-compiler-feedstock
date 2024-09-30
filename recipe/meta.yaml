@@ -1,6 +1,9 @@
 {% set name = "intel-graphics-compiler" %}
-{% set version = "1.0.7041" %}
-{% set llvm_version = "10.0.0" %}
+{% set version = "1.0.17537.20" %}
+{% set spirv_headers_version = "1.3.290.0" %}
+{% set spirv_tools_version = "2024.3" %}
+{% set llvm_version = "14.0" %}
+{% set vc_intrinsics_version = "0.20.1" %}
 
 package:
   name: {{ name|lower }}
@@ -8,32 +11,40 @@ package:
 
 source:
   - url: https://github.com/intel/intel-graphics-compiler/archive/igc-{{ version }}.tar.gz
-    sha256: 299494ff885c8f0452c250867586be937a1aff9d46e6ff61a954bfc1e3a3c406
-
-  - url: https://github.com/intel/vc-intrinsics/archive/d547de9478277e14896fa6418f6bb07ac07d7a1b.tar.gz
-    sha256: 88944edb7abb28d3a8745727acc2fb934a5ea10059e25eeaf3c3169f534875fb
+    folder: igc
+  # TODO: create separate package for the vc-intrinsics
+  - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v{{ vc_intrinsics_version }}.tar.gz
     folder: vc-intrinsics
 
 build:
   number: 0
   skip: true  # [not linux]
+  script_env:
+   - LLVM_VERSION={{ llvm_version }}
+  run_exports:
+    - {{ pin_subpackage(name|lower, max_pin="x") }}
 
 requirements:
   build:
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
     - cmake
     - make
     - flex
     - bison
+    - python *
+    - mako
+    - pyyaml
   host:
     - llvmdev   {{ llvm_version }}
     - llvm      {{ llvm_version }}
     - clangdev  {{ llvm_version }}
     - intel-opencl-clang {{ llvm_version }}
-    - llvm-spirv {{ llvm_version }}
-  run:
-    - intel-opencl-clang {{ llvm_version }}
-    - {{ pin_compatible("llvm-spirv", max_pin="x.x.x.x.x.x") }}
+    - libllvmspirv {{ llvm_version }}
+    - zlib
+    - lld
+    - spirv-tools {{ spirv_tools_version }}
+    - spirv-headers {{ spirv_headers_version }}
 
 test:
   commands:
@@ -42,7 +53,7 @@ test:
 about:
   home: https://github.com/intel/intel-graphics-compiler
   license: MIT
-  license_file: LICENSE.md
+  license_file: igc/LICENSE.md
   license_family: MIT
   summary: The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.
 
