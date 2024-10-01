@@ -30,6 +30,7 @@ requirements:
     - {{ stdlib('c') }}
     - cmake
     - make
+    - lld
     - flex
     - bison
     - python *
@@ -42,7 +43,6 @@ requirements:
     - intel-opencl-clang {{ llvm_version }}
     - libllvmspirv {{ llvm_version }}
     - zlib
-    - lld
     - spirv-tools
     - spirv-headers
 
