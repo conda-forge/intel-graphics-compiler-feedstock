@@ -12,9 +12,11 @@ package:
 source:
   - url: https://github.com/intel/intel-graphics-compiler/archive/igc-{{ version }}.tar.gz
     folder: igc
+    sha256: 44e77384ea69215d0311a08393019323f1c30217c05c972be945f2aed7fbde53
   # TODO: create separate package for the vc-intrinsics
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v{{ vc_intrinsics_version }}.tar.gz
     folder: vc-intrinsics
+    sha256: 01a68a3c8299075ad2b094264bef5109d660f1d53faf614f4f95745ad05f4e3e
 
 build:
   number: 0
