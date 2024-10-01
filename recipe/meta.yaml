@@ -1,7 +1,5 @@
 {% set name = "intel-graphics-compiler" %}
 {% set version = "1.0.17537.20" %}
-{% set spirv_headers_version = "1.3.290.0" %}
-{% set spirv_tools_version = "2024.3" %}
 {% set llvm_version = "14.0" %}
 {% set vc_intrinsics_version = "0.20.1" %}
 
@@ -45,8 +43,8 @@ requirements:
     - libllvmspirv {{ llvm_version }}
     - zlib
     - lld
-    - spirv-tools {{ spirv_tools_version }}
-    - spirv-headers {{ spirv_headers_version }}
+    - spirv-tools
+    - spirv-headers
 
 test:
   commands:
