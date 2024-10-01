@@ -4,12 +4,14 @@ set -ex
 
 sed -i.bak 's/objdump/${OBJDUMP}/g' igc/IGC/Scripts/igc_create_linker_script.sh
 
-export CXXFLAGS="$CXXFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
+PATCH_VERSION=${PKG_VERSION#1.0.}
+if [$PKG_VERSION != "1.0.$PATCH_VERSION"]; then exit 1; fi
 
 cmake ${CMAKE_ARGS} \
     -G Ninja \
     -DCMAKE_VERBOSE_MAKEFILE=TRUE \
     -DCMAKE_BUILD_TYPE=Release \
+    -DIGC_PACKAGE_RELEASE=$PATCH_VERSION \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DLLVM_DIR=$PREFIX/lib/cmake/llvm \
@@ -24,3 +26,10 @@ cmake ${CMAKE_ARGS} \
 
 cmake --build ./build
 cmake --build ./build --target install
+
+# TODO: currently debug symbols are included in Release build by design.
+#   Should we create a split package with debug symbols, like ddeb?
+#   https://github.com/intel/intel-graphics-compiler/issues/341
+find $PREFIX/lib | grep $SHLIB_EXT.$PKG_VERSION | xargs $STRIP
+$STRIP $PREFIX/bin/iga64
+$STRIP $PREFIX/bin/GenX_IR
