@@ -17,7 +17,7 @@ source:
     sha256: 01a68a3c8299075ad2b094264bef5109d660f1d53faf614f4f95745ad05f4e3e
 
 build:
-  number: 1
+  number: 2
   skip: true  # [not linux]
   script_env:
    - LLVM_VERSION={{ llvm_version }}
@@ -28,7 +28,7 @@ requirements:
   build:
     - {{ compiler('cxx') }}
     - {{ stdlib('c') }}
-    - cmake
+    - cmake <4
     - ninja
     - flex
     - bison
