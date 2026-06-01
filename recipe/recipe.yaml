@@ -40,7 +40,7 @@ source:
     sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39
 
 build:
-  number: 0
+  number: 1
   skip: not linux
   script:
     file: build.sh
