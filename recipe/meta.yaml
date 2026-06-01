@@ -1,10 +1,9 @@
-{% set name = "intel-graphics-compiler" %}
 {% set version = "1.0.17537.20" %}
 {% set llvm_version = "14.0" %}
 {% set vc_intrinsics_version = "0.20.1" %}
 
 package:
-  name: {{ name|lower }}
+  name: intel-graphics-compiler
   version: {{ version }}
 
 source:
@@ -22,7 +21,7 @@ build:
   script_env:
    - LLVM_VERSION={{ llvm_version }}
   run_exports:
-    - {{ pin_subpackage(name|lower, max_pin="x") }}
+    - {{ pin_subpackage("intel-graphics-compiler", max_pin="x") }}
 
 requirements:
   build:
