@@ -1,0 +1,89 @@
+schema_version: 1
+
+# ===========================================================================
+# EXPLORATORY: fully un-vendored IGC recipe.
+#
+# This variant drops the in-tree builds of opencl-clang and
+# SPIRV-LLVM-Translator and instead depends on the conda-forge packages, the
+# way the recipe worked for LLVM 14.  It does NOT build yet -- it is blocked on:
+#
+#   * intel-opencl-clang built for LLVM 16 (the feedstock currently only ships
+#     14, 15 and 19.1.0).
+#   * libllvmspirv 16.0.6 carrying TranslatorOpts::setEmitFunctionPtrAddrSpace
+#     (conda-forge/llvm-spirv-feedstock PR #63).
+#
+# Once both are available, this becomes the preferred recipe.  See the
+# update-2.34.4 branch for the vendored variant that builds today.
+# ===========================================================================
+
+context:
+  version: "2.34.4"
+  llvm_version: "16.0"
+  vc_intrinsics_version: "0.25.0"
+
+package:
+  name: intel-graphics-compiler
+  version: ${{ version }}
+
+source:
+  - url: https://github.com/intel/intel-graphics-compiler/archive/v${{ version }}.tar.gz
+    target_directory: igc
+    sha256: 6d96812589094ff24249e9a3a580befb2ce934c39aa19dd5f6d66aff979ed7eb
+    patches:
+      # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved
+      # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the
+      # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.
+      - patches/0001-restore-user-cxx-flags.patch
+  # TODO: create separate package for the vc-intrinsics
+  - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz
+    target_directory: vc-intrinsics
+    sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39
+
+build:
+  number: 1
+  skip: not linux
+  script:
+    file: build.sh
+    env:
+      LLVM_VERSION: ${{ llvm_version }}
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - ${{ stdlib('c') }}
+    - cmake <4
+    - ninja
+    - flex
+    - bison
+    - python *
+    - mako
+    - pyyaml
+  host:
+    - llvmdev ${{ llvm_version }}.*
+    - llvm ${{ llvm_version }}.*
+    - clangdev ${{ llvm_version }}.*
+    - intel-opencl-clang ${{ llvm_version }}.*
+    - libllvmspirv ${{ llvm_version }}.*
+    - zlib
+    - lld
+    - spirv-tools
+    - spirv-headers
+  run_exports:
+    - ${{ pin_subpackage("intel-graphics-compiler", upper_bound="x") }}
+
+tests:
+  - script:
+      - test -f ${PREFIX}/lib/libiga64.so
+
+about:
+  homepage: https://github.com/intel/intel-graphics-compiler
+  license: MIT
+  license_file: igc/LICENSE.md
+  summary: The Intel(R) Graphics Compiler for OpenCL(TM) is an llvm based compiler for OpenCL(TM) targeting Intel Gen graphics hardware architecture.
+
+extra:
+  recipe-maintainers:
+    - oleksandr-pavlyk
+    - ZzEeKkAa
+    - isuruf
+    - hmaarrfk
