@@ -1,0 +1,19 @@
+--- a/IGC/CMakeLists.txt	2026-06-01 13:05:30.211845847 -0400
++++ b/IGC/CMakeLists.txt	2026-06-01 13:05:30.254221290 -0400
+@@ -1175,6 +1175,16 @@
+     )
+ endif()
+ 
++# conda-forge: IGC clears CMAKE_CXX_FLAGS / CMAKE_C_FLAGS near the top of this
++# file (saving them into USER_CXX_FLAGS / USER_C_FLAGS).  The upstream comment
++# promises to re-append them "at the end so that they take precedence", but the
++# code never does, so the compiler driver's "-isystem <prefix>/include" (and
++# other toolchain flags) are dropped and IGC targets cannot find the prebuilt
++# LLVM / SPIRV headers.  Restore the saved flags here, at the end of the
++# compiler-options section.
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USER_CXX_FLAGS}")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USER_C_FLAGS}")
++
+ # ============================================ Linker options ==========================================
+ 
+ foreach(_linkerFlagName IN ITEMS "CMAKE_EXE_LINKER_FLAGS" "CMAKE_SHARED_LINKER_FLAGS")

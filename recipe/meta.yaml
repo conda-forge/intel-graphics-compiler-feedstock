@@ -1,22 +1,43 @@
-{% set version = "1.0.17537.20" %}
-{% set llvm_version = "14.0" %}
-{% set vc_intrinsics_version = "0.20.1" %}
+{% set version = "2.34.4" %}
+{% set llvm_version = "16.0" %}
+{% set vc_intrinsics_version = "0.25.0" %}
+{% set opencl_clang_commit = "07e7c931d8bdb38549a907cf04fd06a278f7cdce" %}
+{% set spirv_translator_commit = "308a0d7acfd7330e64d72a1cd23d272deafb113b" %}
 
 package:
   name: intel-graphics-compiler
   version: {{ version }}
 
 source:
-  - url: https://github.com/intel/intel-graphics-compiler/archive/igc-{{ version }}.tar.gz
+  - url: https://github.com/intel/intel-graphics-compiler/archive/v{{ version }}.tar.gz
     folder: igc
-    sha256: 44e77384ea69215d0311a08393019323f1c30217c05c972be945f2aed7fbde53
+    sha256: 6d96812589094ff24249e9a3a580befb2ce934c39aa19dd5f6d66aff979ed7eb
+    patches:
+      # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved
+      # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the
+      # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.
+      - patches/0001-restore-user-cxx-flags.patch
   # TODO: create separate package for the vc-intrinsics
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v{{ vc_intrinsics_version }}.tar.gz
     folder: vc-intrinsics
-    sha256: 01a68a3c8299075ad2b094264bef5109d660f1d53faf614f4f95745ad05f4e3e
+    sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39
+  # opencl-clang (common_clang) is not published on conda-forge for LLVM 16, so
+  # we vendor and build it in-tree.  The revision is the exact commit that IGC
+  # v2.34.4 pins on branch ocl-open-160.
+  # TODO: revive the intel-opencl-clang feedstock for LLVM 16 and depend on it.
+  - url: https://github.com/intel/opencl-clang/archive/{{ opencl_clang_commit }}.tar.gz
+    folder: opencl-clang
+    sha256: ce29ab859c7fcf8703a6c752d0ae91d2e2ef0e9e57b0142c5f079da7f6c1d49d
+  # IGC v2.34.4 needs a newer SPIRV-LLVM-Translator than conda-forge's
+  # libllvmspirv 16.0.5 (it calls TranslatorOpts::setEmitFunctionPtrAddrSpace).
+  # Vendor the exact commit IGC pins on branch llvm_release_160 and build it.
+  # TODO: depend on a refreshed libllvmspirv 16 instead of vendoring.
+  - url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/{{ spirv_translator_commit }}.tar.gz
+    folder: spirv-llvm-translator
+    sha256: 07930b020627c0e6cb8444dc5404f3d3d9f8cd9e4136fcb252f672b9f3634224
 
 build:
-  number: 2
+  number: 0
   skip: true  # [not linux]
   script_env:
    - LLVM_VERSION={{ llvm_version }}
@@ -38,8 +59,7 @@ requirements:
     - llvmdev   {{ llvm_version }}
     - llvm      {{ llvm_version }}
     - clangdev  {{ llvm_version }}
-    - intel-opencl-clang {{ llvm_version }}
-    - libllvmspirv {{ llvm_version }}
+    - libclang-cpp {{ llvm_version }}
     - zlib
     - lld
     - spirv-tools
