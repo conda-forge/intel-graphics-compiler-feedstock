@@ -1,11 +1,25 @@
 schema_version: 1
 
+# ===========================================================================
+# EXPLORATORY: fully un-vendored IGC recipe.
+#
+# This variant drops the in-tree builds of opencl-clang and
+# SPIRV-LLVM-Translator and instead depends on the conda-forge packages, the
+# way the recipe worked for LLVM 14.  It does NOT build yet -- it is blocked on:
+#
+#   * intel-opencl-clang built for LLVM 16 (the feedstock currently only ships
+#     14, 15 and 19.1.0).
+#   * libllvmspirv 16.0.6 carrying TranslatorOpts::setEmitFunctionPtrAddrSpace
+#     (conda-forge/llvm-spirv-feedstock PR #63).
+#
+# Once both are available, this becomes the preferred recipe.  See the
+# update-2.34.4 branch for the vendored variant that builds today.
+# ===========================================================================
+
 context:
   version: "2.34.4"
   llvm_version: "16.0"
   vc_intrinsics_version: "0.25.0"
-  opencl_clang_commit: "07e7c931d8bdb38549a907cf04fd06a278f7cdce"
-  spirv_translator_commit: "308a0d7acfd7330e64d72a1cd23d272deafb113b"
 
 package:
   name: intel-graphics-compiler
@@ -24,20 +38,6 @@ source:
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz
     target_directory: vc-intrinsics
     sha256: 83d6e0528feb6a47f7818e7c1dd3305dd8a48fb1103d279571dad517a93a8d39
-  # opencl-clang (common_clang) is not published on conda-forge for LLVM 16, so
-  # we vendor and build it in-tree.  The revision is the exact commit that IGC
-  # v2.34.4 pins on branch ocl-open-160.
-  # TODO: revive the intel-opencl-clang feedstock for LLVM 16 and depend on it.
-  - url: https://github.com/intel/opencl-clang/archive/${{ opencl_clang_commit }}.tar.gz
-    target_directory: opencl-clang
-    sha256: ce29ab859c7fcf8703a6c752d0ae91d2e2ef0e9e57b0142c5f079da7f6c1d49d
-  # IGC v2.34.4 needs a newer SPIRV-LLVM-Translator than conda-forge's
-  # libllvmspirv 16.0.5 (it calls TranslatorOpts::setEmitFunctionPtrAddrSpace).
-  # Vendor the exact commit IGC pins on branch llvm_release_160 and build it.
-  # TODO: depend on a refreshed libllvmspirv 16 instead of vendoring.
-  - url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/${{ spirv_translator_commit }}.tar.gz
-    target_directory: spirv-llvm-translator
-    sha256: 07930b020627c0e6cb8444dc5404f3d3d9f8cd9e4136fcb252f672b9f3634224
 
 build:
   number: 0
@@ -62,7 +62,8 @@ requirements:
     - llvmdev ${{ llvm_version }}.*
     - llvm ${{ llvm_version }}.*
     - clangdev ${{ llvm_version }}.*
-    - libclang-cpp ${{ llvm_version }}.*
+    - intel-opencl-clang ${{ llvm_version }}.*
+    - libllvmspirv ${{ llvm_version }}.*
     - zlib
     - lld
     - spirv-tools
