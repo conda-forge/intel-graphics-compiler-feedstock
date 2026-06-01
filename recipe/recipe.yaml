@@ -55,7 +55,7 @@ requirements:
     - llvm ${{ llvm_version }}.*
     - clangdev ${{ llvm_version }}.*
     - libclang-cpp ${{ llvm_version }}.*
-    - libllvmspirv ${{ llvm_version }}.*
+    - libllvmspirv >=16.0.23,<16.1.0a0
     - zlib
     - lld
     - spirv-tools
