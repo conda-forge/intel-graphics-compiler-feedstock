@@ -6,39 +6,11 @@ set -ex
 sed -i.bak 's/objdump/${OBJDUMP}/g' igc/IGC/Scripts/igc_create_linker_script.sh
 
 # ---------------------------------------------------------------------------
-# Build SPIRV-LLVM-Translator.
-#
-# IGC v2.34.4 uses a newer translator API (TranslatorOpts::
-# setEmitFunctionPtrAddrSpace) than conda-forge's libllvmspirv 16.0.5 provides,
-# so we vendor the exact revision IGC pins (branch llvm_release_160) and build
-# it against the prebuilt LLVM 16, installing it into the prefix.  Both
-# opencl-clang and IGC then link this freshly built static LLVMSPIRVLib.
-# SPIRV-Headers come from the conda spirv-headers package via
-# LLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR (the translator pins the same revision).
-# ---------------------------------------------------------------------------
-(
-  export CXXFLAGS="$CXXFLAGS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
-
-  cmake ${CMAKE_ARGS} \
-      -G Ninja \
-      -DCMAKE_VERBOSE_MAKEFILE=TRUE \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=$PREFIX \
-      -DLLVM_DIR=$PREFIX/lib/cmake/llvm \
-      -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$PREFIX \
-      -DLLVM_SPIRV_INCLUDE_TESTS=OFF \
-      -S ./spirv-llvm-translator \
-      -B ./build-spirv-llvm-translator
-  cmake --build ./build-spirv-llvm-translator
-  cmake --build ./build-spirv-llvm-translator --target install
-)
-
-# ---------------------------------------------------------------------------
 # Build opencl-clang (a.k.a. common_clang).
 #
 # conda-forge does not ship intel-opencl-clang for LLVM 16, so we vendor the
 # exact source revision IGC v2.34.4 expects (branch ocl-open-160) and build it
-# against the prebuilt LLVM 16 and the SPIRV-LLVM-Translator built just above.
+# against the prebuilt LLVM 16 and the conda libllvmspirv (SPIRV-LLVM-Translator).
 # IGC then links it through its "from system" discovery path.
 # ---------------------------------------------------------------------------
 (

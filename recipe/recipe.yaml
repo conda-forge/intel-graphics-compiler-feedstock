@@ -5,7 +5,6 @@ context:
   llvm_version: "16.0"
   vc_intrinsics_version: "0.25.0"
   opencl_clang_commit: "07e7c931d8bdb38549a907cf04fd06a278f7cdce"
-  spirv_translator_commit: "308a0d7acfd7330e64d72a1cd23d272deafb113b"
 
 package:
   name: intel-graphics-compiler
@@ -31,13 +30,6 @@ source:
   - url: https://github.com/intel/opencl-clang/archive/${{ opencl_clang_commit }}.tar.gz
     target_directory: opencl-clang
     sha256: ce29ab859c7fcf8703a6c752d0ae91d2e2ef0e9e57b0142c5f079da7f6c1d49d
-  # IGC v2.34.4 needs a newer SPIRV-LLVM-Translator than conda-forge's
-  # libllvmspirv 16.0.5 (it calls TranslatorOpts::setEmitFunctionPtrAddrSpace).
-  # Vendor the exact commit IGC pins on branch llvm_release_160 and build it.
-  # TODO: depend on a refreshed libllvmspirv 16 instead of vendoring.
-  - url: https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/${{ spirv_translator_commit }}.tar.gz
-    target_directory: spirv-llvm-translator
-    sha256: 07930b020627c0e6cb8444dc5404f3d3d9f8cd9e4136fcb252f672b9f3634224
 
 build:
   number: 0
@@ -63,6 +55,7 @@ requirements:
     - llvm ${{ llvm_version }}.*
     - clangdev ${{ llvm_version }}.*
     - libclang-cpp ${{ llvm_version }}.*
+    - libllvmspirv ${{ llvm_version }}.*
     - zlib
     - lld
     - spirv-tools
