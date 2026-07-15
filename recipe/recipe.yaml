@@ -19,6 +19,10 @@ source:
       # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the
       # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.
       - patches/0001-restore-user-cxx-flags.patch
+      # IGC calls llvm::Module::dump() which is a debug-only symbol (guarded by
+      # LLVM_DUMP_METHOD) and is absent from the prebuilt Release LLVM, breaking
+      # the link of libigc.so.  Replace it with print().
+      - patches/0002-avoid-llvm-module-dump-in-release.patch
   # TODO: create separate package for the vc-intrinsics
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz
     target_directory: vc-intrinsics
