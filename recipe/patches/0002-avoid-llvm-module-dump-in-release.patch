@@ -1,0 +1,14 @@
+--- a/IGC/AdaptorOCL/dllInterfaceCompute.cpp
++++ b/IGC/AdaptorOCL/dllInterfaceCompute.cpp
+@@ -454,7 +454,10 @@
+     GenerateSPIRVExtensionsMD(Context, *LLVMModule, SPIRVBinary.str());
+
+     if (IGC_IS_FLAG_ENABLED(ShaderDumpTranslationOnly))
+-      LLVMModule->dump();
++      // conda-forge: llvm::Module::dump() is a debug-only symbol (guarded by
++      // LLVM_DUMP_METHOD) and is not present in a prebuilt Release LLVM, which
++      // breaks linking.  Use print() to the same stream instead.
++      LLVMModule->print(llvm::errs(), nullptr);
+   }
+
+   return success;

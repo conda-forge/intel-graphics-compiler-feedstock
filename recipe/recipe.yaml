@@ -1,7 +1,7 @@
 schema_version: 1
 
 context:
-  version: "2.37.2"
+  version: "2.39.0"
   llvm_version: "16.0"
   vc_intrinsics_version: "0.25.0"
   opencl_clang_commit: "07e7c931d8bdb38549a907cf04fd06a278f7cdce"
@@ -13,12 +13,16 @@ package:
 source:
   - url: https://github.com/intel/intel-graphics-compiler/archive/v${{ version }}.tar.gz
     target_directory: igc
-    sha256: cc207be53fcec7d2ee9e0991892e58e98f443485addeb02ebfa21360760ae656
+    sha256: 7647b2cc1e407196c5381a223a21de0526b4079ffdbaafefa59a2da42b91b9f5
     patches:
       # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved
       # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the
       # prebuilt LLVM/SPIRV headers cannot be found.  Restore them.
       - patches/0001-restore-user-cxx-flags.patch
+      # IGC calls llvm::Module::dump() which is a debug-only symbol (guarded by
+      # LLVM_DUMP_METHOD) and is absent from the prebuilt Release LLVM, breaking
+      # the link of libigc.so.  Replace it with print().
+      - patches/0002-avoid-llvm-module-dump-in-release.patch
   # TODO: create separate package for the vc-intrinsics
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz
     target_directory: vc-intrinsics
