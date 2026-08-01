@@ -63,7 +63,9 @@ requirements:
     - zlib
     - lld
     - spirv-tools
-    - spirv-headers
+    # IGC >=2.40 needs spv::CapabilityPredicatedIOINTEL (SPV_INTEL_predicated_io),
+    # first shipped in SPIRV-Headers vulkan-sdk-1.4.357.0
+    - spirv-headers >=1.4.357
   run_exports:
     - ${{ pin_subpackage("intel-graphics-compiler", upper_bound="x") }}
 
