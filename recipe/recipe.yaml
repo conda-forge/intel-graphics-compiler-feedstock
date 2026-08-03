@@ -1,7 +1,7 @@
 schema_version: 1
 
 context:
-  version: "2.40.1"
+  version: "2.40.2"
   llvm_version: "16.0"
   vc_intrinsics_version: "0.25.0"
   opencl_clang_commit: "07e7c931d8bdb38549a907cf04fd06a278f7cdce"
@@ -13,7 +13,7 @@ package:
 source:
   - url: https://github.com/intel/intel-graphics-compiler/archive/v${{ version }}.tar.gz
     target_directory: igc
-    sha256: 05afcaa3eca53bf214866bad03c35ff4ba4367a647c7b40321faa31675849831
+    sha256: 56df01ac673124283d6c2483c86d1153a3a91841b8e48f7acb8b13ee3a6ec1da
     patches:
       # IGC clears CMAKE_CXX_FLAGS/CMAKE_C_FLAGS but never re-appends the saved
       # USER_*_FLAGS, dropping the compiler's -isystem $PREFIX/include so the
