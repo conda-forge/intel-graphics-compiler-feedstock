@@ -21,6 +21,22 @@ set -ex
 # tarball this recipe fetches, so source.patches cannot reach it.
 export CXXFLAGS="${CXXFLAGS} -include cstdint"
 
+# LLVM 16's llvm/Support/Threading.h includes <ciso646>, which libstdc++ 15
+# answers with a #warning in C++20 mode, fatal since IGC 2.43 dropped the
+# -Wno-error covering IGC/VectorCompiler
+# (intel/intel-graphics-compiler@aa54663e0c97).  Upstream removed the include:
+#
+#   llvm/llvm-project@d8eb4ac41d881a19bea7673d753ba92e6a11f5d6
+#   "[Support] Remove ciso646 include (#123578)"
+#   https://github.com/llvm/llvm-project/pull/123578
+#
+# intel/intel-graphics-compiler#383 proposes the same change as
+# external/llvm/releases/16.0.0/patches_external/change_ciso646_to_version.patch,
+# which would only apply when IGC builds LLVM from source.  The header lives in
+# the host prefix, so apply the fix there.  No -i.bak: a new file in $PREFIX
+# would be packaged.
+sed -i '/#include <ciso646>/d' "${PREFIX}/include/llvm/Support/Threading.h"
+
 # Use the conda objdump when generating the linker version script.
 sed -i.bak 's/objdump/${OBJDUMP}/g' igc/IGC/Scripts/igc_create_linker_script.sh
 
