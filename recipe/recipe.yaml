@@ -23,6 +23,12 @@ source:
       # LLVM_DUMP_METHOD) and is absent from the prebuilt Release LLVM, breaking
       # the link of libigc.so.  Replace it with print().
       - patches/0002-avoid-llvm-module-dump-in-release.patch
+      # IGC >=2.43 calls TranslatorOpts::setErrorHandlingKind, which landed on
+      # llvm_release_160 after the v16.0.29 tag, so no release provides it yet.
+      # Drop it until one does (restores the 2.42 behaviour on invalid SPIR-V).
+      # https://github.com/intel/intel-graphics-compiler/commit/afe4342b3fe5
+      # https://github.com/KhronosGroup/SPIRV-LLVM-Translator/commit/49d2ca4e1f94
+      - patches/0003-drop-translator-error-handling-kind.patch
   # TODO: create separate package for the vc-intrinsics
   - url: https://github.com/intel/vc-intrinsics/archive/refs/tags/v${{ vc_intrinsics_version }}.tar.gz
     target_directory: vc-intrinsics
